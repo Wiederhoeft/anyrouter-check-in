@@ -13,6 +13,9 @@ class NotificationKit:
 		self.email_to: str = os.getenv('EMAIL_TO', '')
 		self.smtp_server: str = os.getenv('CUSTOM_SMTP_SERVER', '')
 		self.pushplus_token = os.getenv('PUSHPLUS_TOKEN')
+		self.pushplus_template = os.getenv('PUSHPLUS_TEMPLATE', 'markdown')
+		self.pushplus_channel = os.getenv('PUSHPLUS_CHANNEL','wechat')
+		self.pushplus_topic = os.getenv('PUSHPLUS_TOPIC')
 		self.server_push_key = os.getenv('SERVERPUSHKEY')
 		self.dingding_webhook = os.getenv('DINGDING_WEBHOOK')
 		self.feishu_webhook = os.getenv('FEISHU_WEBHOOK')
@@ -38,9 +41,20 @@ class NotificationKit:
 		if not self.pushplus_token:
 			raise ValueError('PushPlus Token not configured')
 
-		data = {'token': self.pushplus_token, 'title': title, 'content': content, 'template': 'html'}
+		data = {
+			'token': self.pushplus_token,
+			'title': title,
+			'content': content,
+			'template': self.pushplus_template,
+		}
+
+		if self.pushplus_channel:
+			data['channel'] = self.pushplus_channel
+		if self.pushplus_topic:
+			data['topic'] = self.pushplus_topic
+
 		with httpx.Client(timeout=30.0) as client:
-			client.post('http://www.pushplus.plus/send', json=data)
+			client.post('https://www.pushplus.plus/send', json=data)
 
 	def send_serverPush(self, title: str, content: str):
 		if not self.server_push_key:
