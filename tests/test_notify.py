@@ -13,7 +13,7 @@ sys.path.insert(0, str(project_root))
 
 load_dotenv(project_root / '.env')
 
-from notify import NotificationKit
+from utils.notify import NotificationKit
 
 
 @pytest.fixture
@@ -79,6 +79,19 @@ def test_send_wecom(mock_post, notification_kit):
 	)
 
 
+@patch('httpx.Client')
+def test_send_gotify(mock_client_class, notification_kit):
+	mock_client_instance = MagicMock()
+	mock_client_class.return_value.__enter__.return_value = mock_client_instance
+
+	notification_kit.send_gotify('测试标题', '测试内容')
+
+	expected_url = 'https://gotify.example.com/message?token=test_token'
+	expected_data = {'title': '测试标题', 'message': '测试内容', 'priority': 9}
+
+	mock_client_instance.post.assert_called_once_with(expected_url, json=expected_data)
+
+
 def test_missing_config():
 	os.environ.clear()
 	kit = NotificationKit()
@@ -95,7 +108,8 @@ def test_missing_config():
 @patch('anyrouter.notify.NotificationKit.send_wecom')
 @patch('anyrouter.notify.NotificationKit.send_pushplus')
 @patch('anyrouter.notify.NotificationKit.send_feishu')
-def test_push_message(mock_feishu, mock_pushplus, mock_wecom, mock_dingtalk, mock_email, notification_kit):
+@patch('anyrouter.notify.NotificationKit.send_gotify')
+def test_push_message(mock_gotify, mock_feishu, mock_pushplus, mock_wecom, mock_dingtalk, mock_email, notification_kit):
 	notification_kit.push_message('测试标题', '测试内容')
 
 	assert mock_email.called
@@ -103,3 +117,4 @@ def test_push_message(mock_feishu, mock_pushplus, mock_wecom, mock_dingtalk, moc
 	assert mock_wecom.called
 	assert mock_pushplus.called
 	assert mock_feishu.called
+	assert mock_gotify.called

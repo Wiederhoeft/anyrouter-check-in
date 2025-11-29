@@ -36,7 +36,7 @@
 6. 复制所有 cookies
 
 #### 获取 API User：
-通常在网站的用户设置或 API 设置中可以找到，每个账号都有唯一的标识。
+按照下方图片教程操作获得。
 
 ### 3. 设置 GitHub Environment Secret
 
@@ -276,6 +276,15 @@
 
 ### Server酱
 - `SERVERPUSHKEY`: Server酱的 SendKey
+
+### Telegram Bot
+- `TELEGRAM_BOT_TOKEN`: Telegram Bot 的 Token
+- `TELEGRAM_CHAT_ID`: Telegram Chat ID
+
+### Gotify 推送
+- `GOTIFY_URL`: Gotify 服务的 URL 地址（例如: https://your-gotify-server/message）
+- `GOTIFY_TOKEN`: Gotify 应用的访问令牌
+- `GOTIFY_PRIORITY`: Gotify 消息优先级 (1-10, 默认为 9)
 
 配置步骤：
 1. 在仓库的 Settings -> Environments -> production -> Environment secrets 中添加上述环境变量
